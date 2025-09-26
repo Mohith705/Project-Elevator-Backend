@@ -15,6 +15,8 @@ import { ROLES } from '../config/roles.js';
 import elevatorRoutes from './elevator.routes.js';
 import serviceRoutes from './service.routes.js';
 import customerRoutes from './customer.routes.js';
+import feedbackRoutes from "./feedback.routes.js";
+import customerRequirement from "./customerRequirement.routes.js";
 
 dotenv.config();
 
@@ -364,14 +366,14 @@ const router = Router();
  */
 
 router.use('/auth', authRoutes);
-router.use('/leads', leadRoutes);
-router.use('/quotes', quotationRoutes);
-router.use('/installations', installationRoutes);
-router.use('/amc', amcRoutes);
+router.use('/leads', auth, leadRoutes);
+router.use('/quotes', auth, quotationRoutes);
+router.use('/installations', auth, installationRoutes);
+router.use('/amc', auth, amcRoutes);
 
-router.use('/elevators', elevatorRoutes);
-router.use('/service', serviceRoutes);
-router.use('/customers', customerRoutes);
+router.use('/elevators', auth, elevatorRoutes);
+router.use('/service', auth, serviceRoutes);
+router.use('/customers', auth, customerRoutes);
 
 // Uploads (photo evidence)
 const uploadDir = process.env.UPLOAD_DIR || 'src/uploads';
@@ -389,5 +391,8 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 router.post('/upload', auth, permit(ROLES.SERVICE_EXEC, ROLES.ADMIN, ROLES.MANAGER), upload.single('file'), uploadC.saveUpload);
+
+router.use('/feedback', auth, feedbackRoutes);
+router.use('/requirements', auth, customerRequirement);
 
 export default router;

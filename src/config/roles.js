@@ -3,6 +3,7 @@ export const ROLES = {
     MANAGER: 'MANAGER',
     MARKETING_EXEC: 'MARKETING_EXEC',
     SERVICE_EXEC: 'SERVICE_EXEC',
+    CUSTOMER: 'CUSTOMER'
 };
 
 export const ROLE_HIERARCHY = {

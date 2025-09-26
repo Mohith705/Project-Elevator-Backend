@@ -42,6 +42,36 @@ router.put('/:leadId', auth, permit(ROLES.ADMIN, ROLES.MANAGER), validate(quoteV
 
 /**
  * @swagger
+ * /quotes/{leadId}:
+ *   get:
+ *     summary: Get all quotations for a specific lead
+ *     tags: [Quotes]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: leadId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           pattern: '^[0-9a-fA-F]{24}$'
+ *         description: Lead ID
+ *     responses:
+ *       200:
+ *         description: List of quotations for the lead
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/QuoteResponse'
+ *       404:
+ *         description: Lead not found
+ */
+router.get('/:leadId', auth, validate(quoteV.getQuotesByLead), quoteC.getAllQuotesByLead);
+
+/**
+ * @swagger
  * /quotes/{leadId}/send:
  *   post:
  *     summary: Mark quotation as SENT (demo send)

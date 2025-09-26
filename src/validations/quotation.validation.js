@@ -13,3 +13,9 @@ export const createOrUpdateQuote = {
         notes: Joi.string().allow(''),
     }),
 };
+
+export const getQuotesByLead = {
+    params: Joi.object({
+        leadId: Joi.string().length(24).hex().required(),
+    }),
+};

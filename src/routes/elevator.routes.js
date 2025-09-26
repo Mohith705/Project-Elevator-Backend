@@ -23,10 +23,10 @@ const router = Router();
  *         name:
  *           type: string
  *           description: Name of the elevator type (Passenger, Freight, etc.)
- *         capacity:
+ *         capacityPersons:
  *           type: integer
  *           description: Capacity in number of persons
- *         weight:
+ *         capacityWeight:
  *           type: integer
  *           description: Maximum weight supported (in kg)
  *         price:
@@ -38,8 +38,8 @@ const router = Router();
  *       example:
  *         id: 64a1bcd23fa091
  *         name: Passenger Elevator
- *         capacity: 6
- *         weight: 600
+ *         capacityPersons: 6
+ *         capacityWeight: 600
  *         price: 500000
  *         image: "https://example.com/passenger.png"
  */
@@ -84,7 +84,7 @@ router.get("/types", async (req, res) => {
 
 /**
  * @swagger
- * /api/elevators/types:
+ * /elevators/types:
  *   post:
  *     summary: Create a new elevator type
  *     tags: [Elevators]
@@ -117,7 +117,7 @@ router.get("/types", async (req, res) => {
  *               items:
  *                 $ref: '#/components/schemas/ElevatorType'
  *
- * /api/elevators/types/{id}:
+ * /elevators/types/{id}:
  *   get:
  *     summary: Get details of a specific elevator type
  *     tags: [Elevators]

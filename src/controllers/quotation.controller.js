@@ -53,3 +53,14 @@ export const rejectQuote = catchAsync(async (req, res) => {
     await lead.save();
     res.json({ quote });
 });
+
+export const getAllQuotesByLead = catchAsync(async (req, res) => {
+    const { leadId } = req.params;
+
+    const lead = await Lead.findById(leadId);
+    if (!lead) throw new ApiError(httpStatus.NOT_FOUND, 'Lead not found');
+
+    const quotes = await Quotation.find({ lead: leadId }).sort({ createdAt: -1 });
+
+    res.status(httpStatus.OK).json({ leadId, quotes });
+});

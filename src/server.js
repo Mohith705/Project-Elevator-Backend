@@ -4,6 +4,10 @@ import logger from './config/logger.js';
 
 const port = process.env.PORT || 8080;
 
+console.log("SID:", process.env.TWILIO_SID);
+console.log("TOKEN:", process.env.TWILIO_AUTH_TOKEN);
+console.log("PHONE:", process.env.TWILIO_PHONE_NUMBER);
+
 connectDB()
     .then(() => {
         app.listen(port, () => logger.info(`🚀 Server running on port ${port}`));

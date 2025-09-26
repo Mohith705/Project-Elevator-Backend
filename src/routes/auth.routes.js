@@ -8,16 +8,40 @@ const router = Router();
 
 /**
  * @swagger
+ * tags:
+ *   name: Auth
+ *   description: Authentication APIs
+ */
+
+/**
+ * @swagger
  * /auth/signup:
  *   post:
- *     summary: Register a new user
+ *     summary: Register a new user with phone number
  *     tags: [Auth]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/SignupRequest'
+ *             type: object
+ *             required:
+ *               - name
+ *               - phone
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 example: Bayya Mohith
+ *               phone:
+ *                 type: string
+ *                 example: "+919876543210"
+ *               role:
+ *                 type: string
+ *                 enum: [ADMIN, MANAGER, MARKETING_EXEC, SERVICE_EXEC]
+ *                 example: MARKETING_EXEC
+ *               password:
+ *                 type: string
+ *                 example: "secret123"
  *     responses:
  *       201:
  *         description: User created
@@ -27,10 +51,6 @@ const router = Router();
  *               $ref: '#/components/schemas/AuthResponse'
  *       400:
  *         description: Validation error
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.post('/signup', validate(authV.signup), authC.signup);
 
@@ -38,14 +58,24 @@ router.post('/signup', validate(authV.signup), authC.signup);
  * @swagger
  * /auth/login:
  *   post:
- *     summary: Login
+ *     summary: Login with phone + password
  *     tags: [Auth]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/LoginRequest'
+ *             type: object
+ *             required:
+ *               - phone
+ *               - password
+ *             properties:
+ *               phone:
+ *                 type: string
+ *                 example: "+919876543210"
+ *               password:
+ *                 type: string
+ *                 example: "secret123"
  *     responses:
  *       200:
  *         description: Login successful
@@ -55,10 +85,6 @@ router.post('/signup', validate(authV.signup), authC.signup);
  *               $ref: '#/components/schemas/AuthResponse'
  *       401:
  *         description: Invalid credentials
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/ErrorResponse'
  */
 router.post('/login', validate(authV.login), authC.login);
 
@@ -89,24 +115,30 @@ router.get('/me', auth, authC.me);
  * @swagger
  * /auth/otp/request:
  *   post:
- *     summary: Request OTP (demo)
+ *     summary: Request OTP via SMS
  *     tags: [Auth]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/RequestOtpRequest'
+ *             type: object
+ *             required:
+ *               - phone
+ *             properties:
+ *               phone:
+ *                 type: string
+ *                 example: "+919876543210"
  *     responses:
  *       200:
- *         description: OTP generated (demo returns code)
+ *         description: OTP sent via SMS
  *         content:
  *           application/json:
  *             schema:
  *               type: object
  *               properties:
- *                 message: { type: string }
- *                 code: { type: string, description: "Only in demo" }
+ *                 message:
+ *                   type: string
  */
 router.post('/otp/request', validate(authV.requestOtp), authC.requestOtp);
 
@@ -114,17 +146,27 @@ router.post('/otp/request', validate(authV.requestOtp), authC.requestOtp);
  * @swagger
  * /auth/otp/verify:
  *   post:
- *     summary: Verify OTP (demo)
+ *     summary: Verify OTP via SMS
  *     tags: [Auth]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/VerifyOtpRequest'
+ *             type: object
+ *             required:
+ *               - phone
+ *               - code
+ *             properties:
+ *               phone:
+ *                 type: string
+ *                 example: "+919876543210"
+ *               code:
+ *                 type: string
+ *                 example: "123456"
  *     responses:
  *       200:
- *         description: OTP verified, short-lived token issued
+ *         description: OTP verified successfully
  *         content:
  *           application/json:
  *             schema:
