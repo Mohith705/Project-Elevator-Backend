@@ -19,7 +19,7 @@ const signToken = (user) => {
 export const signup = catchAsync(async (req, res) => {
     const user = await User.create(req.body);
     const token = signToken(user);
-    res.status(httpStatus.CREATED).json({ user: { id: user.id, name: user.name, email: user.email, role: user.role }, token });
+    res.status(httpStatus.CREATED).json({ user: { id: user.id, name: user.name, role: user.role }, token });
 });
 
 // export const login = catchAsync(async (req, res) => {
@@ -61,6 +61,21 @@ export const login = catchAsync(async (req, res) => {
 export const me = catchAsync(async (req, res) => {
     const user = await User.findById(req.user.id);
     res.json({ user });
+});
+
+export const service_executive_list = catchAsync(async(req, res) => {
+    const serviceExecutives = await User.find({role: 'SERVICE_EXEC'}).select('id name phone');
+    res.json({ serviceExecutives });
+})
+
+export const users_list = catchAsync(async(req, res) => {
+    const users = await User.find().select('id name phone role');
+    res.json({ users });
+});
+
+export const customer_list = catchAsync(async(req, res) => {
+    const customers = await User.find({role: 'CUSTOMER'}).select('id name phone');
+    res.json({ customers });
 });
 
 // export const requestOtp = catchAsync(async (req, res) => {

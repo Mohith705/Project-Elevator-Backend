@@ -67,4 +67,68 @@ router.post('/:leadId', auth, permit(ROLES.ADMIN, ROLES.MANAGER), validate(amcV.
  */
 router.get('/:leadId', auth, permit(ROLES.ADMIN, ROLES.MANAGER), amcC.getAmc);
 
+/**
+ * @swagger
+ * /amc/{leadId}:
+ *   patch:
+ *     summary: Update AMC for a lead
+ *     tags: [AMC]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: leadId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           pattern: '^[0-9a-fA-F]{24}$'
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/CreateAmcRequest'
+ *     responses:
+ *       200:
+ *         description: AMC updated successfully
+ *       404:
+ *         description: AMC not found
+ */
+router.patch(
+    '/:leadId',
+    auth,
+    permit(ROLES.ADMIN, ROLES.MANAGER),
+    validate(amcV.createAmc),
+    amcC.updateAmc
+);
+
+/**
+ * @swagger
+ * /amc/{leadId}:
+ *   delete:
+ *     summary: Delete AMC for a lead
+ *     tags: [AMC]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: leadId
+ *         required: true
+ *         schema:
+ *           type: string
+ *           pattern: '^[0-9a-fA-F]{24}$'
+ *     responses:
+ *       200:
+ *         description: AMC deleted successfully
+ *       404:
+ *         description: AMC not found
+ */
+router.delete(
+    '/:leadId',
+    auth,
+    permit(ROLES.ADMIN, ROLES.MANAGER),
+    amcC.deleteAmc
+);
+
+
 export default router;

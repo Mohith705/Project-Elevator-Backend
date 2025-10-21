@@ -180,4 +180,102 @@ router.post('/otp/request', validate(authV.requestOtp), authC.requestOtp);
  */
 router.post('/otp/verify', validate(authV.verifyOtp), authC.verifyOtp);
 
+/**
+ * @swagger
+ * /auth/getserviceexecs:
+ *   get:
+ *     summary: Get list of all service executives
+ *     description: Returns all users with the role `SERVICE_EXEC`.
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: List of service executives
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 serviceExecutives:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       name:
+ *                         type: string
+ *                       phone:
+ *                         type: string
+ *       401:
+ *         description: Unauthorized access
+ */
+router.get('/getserviceexecs', auth, authC.service_executive_list);
+
+
+/**
+ * @swagger
+ * /auth/getusers:
+ *   get:
+ *     summary: Get list of all users
+ *     description: Returns all registered users with basic details.
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: List of users
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 users:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       name:
+ *                         type: string
+ *                       phone:
+ *                         type: string
+ *                       role:
+ *                         type: string
+ *       401:
+ *         description: Unauthorized access
+ */
+router.get('/getusers', auth, authC.users_list);
+
+
+/**
+ * @swagger
+ * /auth/getcustomers:
+ *   get:
+ *     summary: Get list of all customers
+ *     description: Returns all users with the role `CUSTOMER`.
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *         description: List of customers
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 customers:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       name:
+ *                         type: string
+ *                       phone:
+ *                         type: string
+ *       401:
+ *         description: Unauthorized access
+ */
+router.get('/getcustomers', auth, authC.customer_list);
+
+
 export default router;

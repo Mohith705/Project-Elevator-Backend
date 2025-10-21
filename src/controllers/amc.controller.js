@@ -20,3 +20,32 @@ export const getAmc = catchAsync(async (req, res) => {
     if (!amc) throw new ApiError(httpStatus.NOT_FOUND, 'AMC not found');
     res.json({ amc });
 });
+
+export const updateAmc = catchAsync(async (req, res) => {
+    const { leadId } = req.params;
+
+    const amc = await AMC.findOne({ lead: leadId });
+    if (!amc) throw new ApiError(httpStatus.NOT_FOUND, 'AMC not found');
+
+    const updateData = req.body;
+    if (updateData.startsAt) {
+        const startsAt = new Date(updateData.startsAt);
+        const endsAt = new Date(startsAt);
+        endsAt.setMonth(endsAt.getMonth() + (updateData.planMonths || amc.planMonths || 12));
+        updateData.startsAt = startsAt;
+        updateData.endsAt = endsAt;
+    }
+
+    Object.assign(amc, updateData);
+    await amc.save();
+
+    res.json({ message: 'AMC updated successfully', amc });
+});
+
+export const deleteAmc = catchAsync(async (req, res) => {
+    const { leadId } = req.params;
+    const amc = await AMC.findOneAndDelete({ lead: leadId });
+
+    if (!amc) throw new ApiError(httpStatus.NOT_FOUND, 'AMC not found');
+    res.json({ message: 'AMC deleted successfully', deletedAmc: amc });
+});

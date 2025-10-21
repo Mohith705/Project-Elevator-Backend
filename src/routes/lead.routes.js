@@ -9,6 +9,60 @@ const router = Router();
 
 /**
  * @swagger
+ * components:
+ *   schemas:
+ *     Item:
+ *       type: object
+ *       properties:
+ *         elevatorId:
+ *           type: string
+ *           description: ID of the elevator
+ *         name:
+ *           type: string
+ *           description: Elevator name
+ *
+ *     CreateLeadRequest:
+ *       type: object
+ *       required:
+ *         - title
+ *         - clientName
+ *       properties:
+ *         title:
+ *           type: string
+ *         clientName:
+ *           type: string
+ *         clientEmail:
+ *           type: string
+ *         clientPhone:
+ *           type: string
+ *         address:
+ *           type: string
+ *         location:
+ *           type: object
+ *           properties:
+ *             lat:
+ *               type: number
+ *             lng:
+ *               type: number
+ *         requirements:
+ *           type: string
+ *         referralId:
+ *           type: string
+ *           description: Phone number of the referrer (optional)
+ *         items:
+ *           type: array
+ *           items:
+ *             $ref: '#/components/schemas/Item'
+ *
+ *     LeadResponse:
+ *       type: object
+ *       properties:
+ *         lead:
+ *           $ref: '#/components/schemas/CreateLeadRequest'
+ */
+
+/**
+ * @swagger
  * /leads:
  *   post:
  *     summary: Create a new lead
@@ -24,36 +78,11 @@ const router = Router();
  *     responses:
  *       201:
  *         description: Lead created
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/LeadResponse'
  *   get:
  *     summary: List leads (paginated)
  *     tags: [Leads]
  *     security:
  *       - bearerAuth: []
- *     parameters:
- *       - in: query
- *         name: status
- *         schema:
- *           $ref: '#/components/schemas/LeadStatus'
- *       - in: query
- *         name: q
- *         schema: { type: string }
- *       - in: query
- *         name: page
- *         schema: { type: integer, minimum: 1, default: 1 }
- *       - in: query
- *         name: limit
- *         schema: { type: integer, minimum: 1, default: 20 }
- *     responses:
- *       200:
- *         description: List of leads
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/LeadListResponse'
  */
 router
     .route('/')
@@ -64,26 +93,10 @@ router
  * @swagger
  * /leads/{id}:
  *   get:
- *     summary: Get a lead by id
+ *     summary: Get a lead by ID
  *     tags: [Leads]
  *     security:
  *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *           pattern: '^[0-9a-fA-F]{24}$'
- *     responses:
- *       200:
- *         description: Lead
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/LeadResponse'
- *       404:
- *         description: Lead not found
  */
 router
     .route('/:id')
@@ -97,31 +110,59 @@ router
  *     tags: [Leads]
  *     security:
  *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *           pattern: '^[0-9a-fA-F]{24}$'
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/AssignLeadRequest'
- *     responses:
- *       200:
- *         description: Lead assigned
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/LeadResponse'
- *       404:
- *         description: Lead not found
  */
 router
     .route('/:id/assign')
     .post(auth, permit(ROLES.ADMIN, ROLES.MANAGER), validate(leadV.assignLead), leadC.assignLead);
+
+/**
+ * @swagger
+ * /leads/referral/{phoneNumber}:
+ *   get:
+ *     summary: Get all leads referred by a specific phone number
+ *     tags: [Leads]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: phoneNumber
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of referred leads
+ */
+router
+    .route('/referral/:phoneNumber')
+    .get(auth, permit(ROLES.ADMIN, ROLES.MANAGER, ROLES.MARKETING_EXEC), validate(leadV.getReferralLeads), leadC.getLeadsByReferral);
+
+
+/**
+ * @swagger
+ * /leads/phone/{phoneNumber}:
+ *   get:
+ *     summary: Get all leads by client phone number
+ *     tags: [Leads]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: phoneNumber
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: List of leads for the given phone number
+ */
+router
+    .route('/phone/:phoneNumber')
+    .get(
+        auth,
+        permit(ROLES.ADMIN, ROLES.MANAGER, ROLES.MARKETING_EXEC),
+        validate(leadV.getReferralLeads), // reuse same validation (phoneNumber param)
+        leadC.getLeadsByPhone
+    );
 
 export default router;

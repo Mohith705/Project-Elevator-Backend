@@ -5,12 +5,11 @@ import { ROLES } from '../config/roles.js';
 const userSchema = new mongoose.Schema(
     {
         name: { type: String, required: true },
-        email: { type: String, unique: true, lowercase: true },
         phone: { type: String, required: true, unique: true },
         role: {
             type: String,
             enum: Object.values(ROLES),
-            default: ROLES.MARKETING_EXEC,
+            default: ROLES.CUSTOMER,
             index: true,
         },
         password: { type: String, required: true, select: false },

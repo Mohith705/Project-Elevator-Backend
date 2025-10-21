@@ -11,6 +11,11 @@ export const LEAD_STATUS = {
     COMPLETED: 'COMPLETED',
 };
 
+const itemSchema = new mongoose.Schema({
+    elevatorId: { type: mongoose.Schema.Types.ObjectId, ref: 'Elevator' },
+    name: { type: String },
+});
+
 const leadSchema = new mongoose.Schema(
     {
         title: { type: String, required: true },
@@ -23,7 +28,17 @@ const leadSchema = new mongoose.Schema(
             lng: Number,
         },
         requirements: { type: String },
-        status: { type: String, enum: Object.values(LEAD_STATUS), default: LEAD_STATUS.NEW, index: true },
+        items: {
+            type: [itemSchema],
+            default: [],
+        },
+        referralId: { type: String, default: null }, // Optional referrer’s phone number
+        status: {
+            type: String,
+            enum: Object.values(LEAD_STATUS),
+            default: LEAD_STATUS.NEW,
+            index: true,
+        },
         createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
         assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     },
