@@ -1,7 +1,15 @@
 import express from "express";
 import validate from "../middlewares/validate.js";
-import { submitFeedback as submitFeedbackValidation } from "../validations/feedback.validation.js";
-import { submitFeedback, getAllFeedback } from "../controllers/feedback.controller.js";
+import { auth, permit } from "../middlewares/auth.js";
+import { ROLES } from "../config/roles.js";
+import {
+  submitFeedback,
+  getAllFeedback,
+  getApprovedFeedback,
+  updateFeedback,
+  deleteFeedback,
+} from "../controllers/feedback.controller.js";
+import { submitFeedback as submitFeedbackValidation, updateFeedback as updateFeedbackValidation } from "../validations/feedback.validation.js";
 
 const router = express.Router();
 
@@ -20,32 +28,33 @@ const router = express.Router();
  *       type: object
  *       required:
  *         - name
- *         - company
- *         - email
+ *         - companyOrProject
+ *         - phone
+ *         - productType
+ *         - location
  *         - feedback
+ *         - allowShowcase
  *       properties:
  *         name:
  *           type: string
- *           example: Bayya Mohith
  *         companyOrProject:
  *           type: string
- *           example: Yatra Constructions
  *         phone:
  *           type: string
- *           example: +919876543210
  *         productType:
  *           type: string
  *           enum: [Passenger Elevator, Home Elevator, Freight, Escalator, Travelator, Other]
- *           example: Passenger Elevator
+ *         otherProduct:
+ *           type: string
  *         location:
  *           type: string
- *           example: Hyderabad
  *         feedback:
  *           type: string
- *           example: "Great service, professional team!"
  *         allowShowcase:
  *           type: boolean
- *           example: true
+ *         approved:
+ *           type: boolean
+ *           description: "Indicates if admin approved the testimonial"
  */
 
 /**
@@ -61,10 +70,8 @@ const router = express.Router();
  *           schema:
  *             $ref: '#/components/schemas/Feedback'
  *     responses:
- *       200:
+ *       201:
  *         description: Feedback submitted successfully
- *       400:
- *         description: Validation error
  */
 router.post("/", validate(submitFeedbackValidation), submitFeedback);
 
@@ -72,18 +79,69 @@ router.post("/", validate(submitFeedbackValidation), submitFeedback);
  * @swagger
  * /feedback:
  *   get:
- *     summary: Get all feedback/testimonials
+ *     summary: Get all feedback (admin view)
  *     tags: [Feedback]
  *     responses:
  *       200:
- *         description: List of feedback
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 $ref: '#/components/schemas/Feedback'
+ *         description: List of all feedback
  */
-router.get("/", getAllFeedback);
+router.get("/", auth, permit(ROLES.ADMIN, ROLES.MANAGER), getAllFeedback);
+
+/**
+ * @swagger
+ * /feedback/approved:
+ *   get:
+ *     summary: Get only approved and showcase-allowed feedback
+ *     tags: [Feedback]
+ *     responses:
+ *       200:
+ *         description: List of approved feedback for public view
+ */
+router.get("/approved", getApprovedFeedback);
+
+/**
+ * @swagger
+ * /feedback/{id}:
+ *   put:
+ *     summary: Update feedback (admin only)
+ *     tags: [Feedback]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Feedback'
+ *     responses:
+ *       200:
+ *         description: Feedback updated successfully
+ */
+router.put("/:id", auth, permit(ROLES.ADMIN, ROLES.MANAGER), validate(updateFeedbackValidation), updateFeedback);
+
+/**
+ * @swagger
+ * /feedback/{id}:
+ *   delete:
+ *     summary: Delete feedback (admin only)
+ *     tags: [Feedback]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Feedback deleted successfully
+ */
+router.delete("/:id", auth, permit(ROLES.ADMIN, ROLES.MANAGER), deleteFeedback);
 
 export default router;
