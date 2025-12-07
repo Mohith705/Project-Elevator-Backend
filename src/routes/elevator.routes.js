@@ -43,7 +43,7 @@ const router = Router();
  *         price: 500000
  *         image: "https://example.com/passenger.png"
  */
-router.post("/types", async (req, res) => {
+router.post("/types", auth, async (req, res) => {
     try {
         const { name, capacityPersons, capacityWeight, price, image } = req.body;
 
@@ -73,7 +73,7 @@ router.post("/types", async (req, res) => {
  *   name: Elevators
  *   description: Elevator catalog management
  */
-router.get("/types", async (req, res) => {
+router.get("/types", auth, async (req, res) => {
     try {
         const elevators = await ElevatorType.find();
         res.status(200).json(elevators);
@@ -138,7 +138,7 @@ router.get("/types", async (req, res) => {
  *       404:
  *         description: Elevator type not found
  */
-router.get("/types/:id", async (req, res) => {
+router.get("/types/:id", auth, async (req, res) => {
     try {
         const elevator = await ElevatorType.findById(req.params.id);
         if (!elevator) {
@@ -147,6 +147,39 @@ router.get("/types/:id", async (req, res) => {
         res.status(200).json(elevator);
     } catch (error) {
         res.status(500).json({ message: "Error fetching elevator type", error: error.message });
+    }
+});
+
+/**
+ * @swagger
+ * /elevators/types/{id}:
+ *   delete:
+ *     summary: Delete a specific elevator type
+ *     tags: [Elevators]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Elevator type ID
+ *     responses:
+ *       200:
+ *         description: Elevator type deleted successfully
+ *       404:
+ *         description: Elevator type not found
+ */
+router.delete("/types/:id", auth, async (req, res) => {
+    try {
+        const deleted = await ElevatorType.findByIdAndDelete(req.params.id);
+
+        if (!deleted) {
+            return res.status(404).json({ message: "Elevator type not found" });
+        }
+
+        res.status(200).json({ message: "Elevator type deleted successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Error deleting elevator type", error: error.message });
     }
 });
 

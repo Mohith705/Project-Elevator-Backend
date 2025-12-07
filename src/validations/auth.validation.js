@@ -1,60 +1,49 @@
-// import Joi from 'joi';
-
-// export const signup = {
-//     body: Joi.object({
-//         name: Joi.string().min(2).required(),
-//         email: Joi.string().email().required(),
-//         phone: Joi.string().optional(),
-//         role: Joi.string().valid('ADMIN', 'MANAGER', 'MARKETING_EXEC', 'SERVICE_EXEC').optional(),
-//         password: Joi.string().min(6).required(),
-//     }),
-// };
-
-// export const login = {
-//     body: Joi.object({
-//         email: Joi.string().email().required(),
-//         password: Joi.string().required(),
-//     }),
-// };
-
-// export const requestOtp = {
-//     body: Joi.object({ email: Joi.string().email().required() }),
-// };
-
-// export const verifyOtp = {
-//     body: Joi.object({ email: Joi.string().email().required(), code: Joi.string().length(6).required() }),
-// };
-
-
 import Joi from 'joi';
+import libphonenumber from 'google-libphonenumber';
+
+const { PhoneNumberUtil } = libphonenumber;
+const phoneUtil = PhoneNumberUtil.getInstance();
+
+const validateIndianPhone = (value, helpers) => {
+    try {
+        const parsed = phoneUtil.parse(value, 'IN');
+
+        if (!phoneUtil.isValidNumberForRegion(parsed, 'IN')) {
+            return helpers.error('any.invalid');
+        }
+
+        return value;
+    } catch (err) {
+        return helpers.error('any.invalid');
+    }
+};
 
 export const signup = {
     body: Joi.object({
         name: Joi.string().min(2).required(),
         phone: Joi.string()
-            .pattern(/^\+?[1-9]\d{9,14}$/) // E.164 format like +919876543210
+            .custom(validateIndianPhone, 'Indian phone validation')
             .required(),
         role: Joi.string()
             .valid('ADMIN', 'MANAGER', 'MARKETING_EXEC', 'SERVICE_EXEC', 'CUSTOMER')
             .optional(),
-        password: Joi.string().min(6).optional(), // only if you still want fallback password
+        password: Joi.string().min(6).optional(),
     }),
 };
 
-// 🔹 No more email/password login → using OTP
 export const login = {
     body: Joi.object({
         phone: Joi.string()
-            .pattern(/^\+?[1-9]\d{9,14}$/)
+            .custom(validateIndianPhone, 'Indian phone validation')
             .required(),
-        password: Joi.string().min(6).required()
+        password: Joi.string().min(6).required(),
     }),
 };
 
 export const requestOtp = {
     body: Joi.object({
         phone: Joi.string()
-            .pattern(/^\+?[1-9]\d{9,14}$/)
+            .custom(validateIndianPhone, 'Indian phone validation')
             .required(),
     }),
 };
@@ -62,7 +51,7 @@ export const requestOtp = {
 export const verifyOtp = {
     body: Joi.object({
         phone: Joi.string()
-            .pattern(/^\+?[1-9]\d{9,14}$/)
+            .custom(validateIndianPhone, 'Indian phone validation')
             .required(),
         code: Joi.string()
             .length(6)

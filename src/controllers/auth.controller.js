@@ -17,10 +17,23 @@ const signToken = (user) => {
 };
 
 export const signup = catchAsync(async (req, res) => {
+    const { phone } = req.body;
+
+    // Check if phone already exists
+    const existing = await User.findOne({ phone });
+    if (existing) {
+        throw new ApiError(httpStatus.BAD_REQUEST, 'Phone number already registered');
+    }
+
     const user = await User.create(req.body);
     const token = signToken(user);
-    res.status(httpStatus.CREATED).json({ user: { id: user.id, name: user.name, role: user.role }, token });
+
+    res.status(httpStatus.CREATED).json({
+        user: { id: user.id, name: user.name, role: user.role, phone: user.phone },
+        token
+    });
 });
+
 
 // export const login = catchAsync(async (req, res) => {
 //     const { email, password } = req.body;
