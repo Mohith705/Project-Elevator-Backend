@@ -13,11 +13,11 @@ const feedbackSchema = new mongoose.Schema(
         otherProduct: { type: String },
         location: { type: String, required: true },
         feedback: { type: String, required: true },
+        images: [{ type: String }], // Cloudinary URLs
         allowShowcase: { type: Boolean, default: false },
-        approved: { type: Boolean, default: false }, // New field for admin approval
+        approved: { type: Boolean, default: false },
     },
     { timestamps: true }
 );
 
-const Feedback = mongoose.model("Feedback", feedbackSchema);
-export default Feedback;
+export default mongoose.model("Feedback", feedbackSchema);

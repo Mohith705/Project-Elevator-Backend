@@ -45,7 +45,7 @@ const router = Router();
  */
 router.post("/types", auth, async (req, res) => {
     try {
-        const { name, capacityPersons, capacityWeight, price, image } = req.body;
+        const { name, capacityPersons, capacityWeight, price, images } = req.body;
 
         if (!name || !capacityPersons || !capacityWeight || !price) {
             return res.status(400).json({ message: "All required fields must be provided" });
@@ -56,7 +56,7 @@ router.post("/types", auth, async (req, res) => {
             capacityPersons,
             capacityWeight,
             price,
-            image,
+            images,
         });
 
         const savedElevator = await newElevator.save();

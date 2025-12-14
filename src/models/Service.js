@@ -1,39 +1,24 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const serviceRequestSchema = new mongoose.Schema(
     {
-        userId: {
-            type: String,
-            required: true,
-            trim: true,
-        },
-        elevatorId: {
-            type: String,
-            required: false,
-            trim: true,
-        },
+        userId: { type: String, required: true, trim: true },
+        elevatorId: { type: String, trim: true },
         issue: {
             type: String,
             required: function () {
-                return !this.isEmergency; // Issue is required only for normal service requests
+                return !this.isEmergency;
             },
-            trim: true,
         },
+        images: [{ type: String }], // Issue images (Cloudinary)
         status: {
             type: String,
-            enum: ['Pending', 'In Progress', 'Completed', 'HELP ON THE WAY'],
-            default: 'Pending',
+            enum: ["Pending", "In Progress", "Completed", "HELP ON THE WAY"],
+            default: "Pending",
         },
-        isEmergency: {
-            type: Boolean,
-            default: false,
-        },
+        isEmergency: { type: Boolean, default: false },
     },
-    {
-        timestamps: true,
-    }
+    { timestamps: true }
 );
 
-const ServiceRequest = mongoose.model('ServiceRequest', serviceRequestSchema);
-
-export default ServiceRequest;
+export default mongoose.model("ServiceRequest", serviceRequestSchema);
